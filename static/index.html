@@ -1,0 +1,436 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000"><title>Magicscan</title>
+<link rel="apple-touch-icon" href="/static/icon-180.png"><link rel="icon" type="image/png" href="/static/icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Magicscan"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{color-scheme:dark;--g:rgba(255,255,255,.07);--b:rgba(255,255,255,.14);--t:#f5f5f7;--m:#8e8e93;--a:#0a84ff;--ok:#30d158;--w:#ff9f0a;--r:#ff453a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}[hidden]{display:none!important}
+body{margin:0;color:var(--t);font:15px system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;background:radial-gradient(800px 480px at 12% -8%,#13243f,transparent 60%),radial-gradient(700px 480px at 100% 105%,#2b1340,transparent 55%),#000 fixed}
+main{max-width:980px;margin:auto;padding:calc(env(safe-area-inset-top) + 12px) 14px calc(100px + env(safe-area-inset-bottom))}
+.g{background:var(--g);border:1px solid var(--b);border-radius:20px;padding:14px;-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%)}
+h2{margin:6px 2px 12px;font-size:26px;letter-spacing:-.5px;text-align:center}h3{margin:0 0 4px;font-size:20px}
+.m{color:var(--m);font-size:13px}.row{display:flex;gap:10px;margin:10px 0}.row>*{flex:1;min-width:0}
+select,input{width:100%;background:rgba(255,255,255,.08);border:1px solid var(--b);color:var(--t);border-radius:12px;padding:11px 12px;font-size:16px;outline:0}
+select:focus,input:focus,button:focus-visible{border-color:var(--a)}
+select{color-scheme:dark}select option,select optgroup{background:#1d1d22;color:#f5f5f7}
+.btn{border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:600;background:var(--a);color:#fff;cursor:pointer;width:100%}
+.btn.s{background:var(--g);border:1px solid var(--b)}.btn.d{background:rgba(255,69,58,.18);color:var(--r)}
+.lnk{background:none;border:0;color:var(--m);padding:12px;width:100%;font-size:15px;cursor:pointer}
+.cam{position:relative;aspect-ratio:3/4;max-height:60vh;width:100%;margin:12px auto;border-radius:24px;overflow:hidden;background:#05070b;border:1px solid var(--b)}
+.cam video,.cam canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+[hidden]{display:none!important}.chips{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}.chip{flex:1;padding:10px 0;border-radius:12px;border:1px solid var(--b);background:rgba(255,255,255,.06);color:inherit;font-weight:600;cursor:pointer}.chip.on{background:#0a84ff;border-color:#0a84ff;color:#fff}
+.guide{position:absolute;inset:7% 14%;border:2px dashed rgba(255,255,255,.28);border-radius:14px;pointer-events:none}
+#st{position:absolute;left:12px;right:12px;bottom:12px;padding:10px 14px;border-radius:14px;text-align:center;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+@media(min-width:640px){.grid{grid-template-columns:repeat(4,1fr)}}@media(min-width:900px){.grid{grid-template-columns:repeat(5,1fr)}}
+.tile{padding:8px;cursor:pointer;position:relative;border-radius:16px}
+.tile img{width:100%;aspect-ratio:5/7;object-fit:contain;border-radius:8px;display:block}
+.tile b{display:block;margin-top:6px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .p{color:var(--ok);font-weight:600}.qb{position:absolute;top:10px;right:10px;background:var(--a);border-radius:99px;padding:2px 9px;font-size:13px;font-weight:700}
+.pill{display:inline-block;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600;margin-top:6px}
+.pill.ok{background:rgba(48,209,88,.18);color:var(--ok)}.pill.w{background:rgba(255,159,10,.18);color:var(--w)}.pill.i{background:var(--g);color:var(--m)}
+nav{display:none}[hidden]{display:none!important}
+#menu-btn{position:fixed;top:calc(14px + env(safe-area-inset-top));left:14px;z-index:12;width:46px;height:46px;border:0;border-radius:14px;background:var(--a);color:#252b36;font-size:24px;line-height:1;box-shadow:0 6px 18px rgba(26,34,51,.18);cursor:pointer}
+#drawer{position:fixed;inset:0 auto 0 0;width:min(300px,82vw);z-index:11;transform:translateX(-102%);transition:transform .22s ease;background:rgba(255,253,244,.98);border-right:1px solid var(--b);box-shadow:8px 0 30px rgba(26,34,51,.16);padding:calc(78px + env(safe-area-inset-top)) 18px 24px}
+#drawer h3{margin:0 0 24px;padding:0 10px;font-size:24px}
+#drawer button{display:block;width:100%;padding:15px 12px;margin:8px 0;border:0;border-radius:14px;background:transparent;color:var(--t);text-align:left;font-size:17px;cursor:pointer}
+#drawer button.on{background:var(--a);font-weight:700}
+body.drawer-open #drawer{transform:translateX(0)}
+body.drawer-open main{transform:translateX(min(300px,82vw));width:100%;transition:transform .22s ease}
+main{transition:transform .22s ease,width .22s ease}
+.pt{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0}.pt th,.pt td{padding:7px 4px;text-align:right;border-top:1px solid var(--b)}.pt th{color:var(--m);font-weight:600;border-top:0}.pt td:first-child,.pt th:first-child{text-align:left}
+.sh{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sh>.g{width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:26px 26px 0 0;background:rgba(22,22,26,.88);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.top{display:flex;gap:14px;align-items:flex-start}.big{width:42%;max-width:210px;border-radius:10px}
+.alt{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--b);cursor:pointer}.alt img{width:46px;border-radius:5px}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);z-index:20;padding:12px 18px;border-radius:16px;background:rgba(48,209,88,.2);border:1px solid rgba(48,209,88,.5);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);max-width:92vw}
+.sgrid{grid-template-columns:repeat(2,1fr)}@media(min-width:640px){.sgrid{grid-template-columns:repeat(3,1fr)}}@media(min-width:900px){.sgrid{grid-template-columns:repeat(4,1fr)}}
+.tile.sel{outline:2px solid var(--a);outline-offset:-2px;background:rgba(10,132,255,.18)}.ck{position:absolute;top:10px;left:10px;z-index:1;background:var(--a);color:#fff;border-radius:99px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700}
+#selbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:6;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:20px;background:rgba(30,30,34,.85);border:1px solid var(--b);-webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);max-width:94vw}#selbar .btn{width:auto;padding:10px 14px;font-size:15px}#selinfo{font-weight:600;padding:0 6px;white-space:nowrap}
+.lg{height:84px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}.lg img,.tile .lg img{width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;aspect-ratio:auto;border-radius:0;display:block}
+.bar{height:6px;border-radius:9px;background:rgba(255,255,255,.12);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--a),var(--ok));border-radius:9px}
+.qty{display:flex;align-items:center;gap:8px 10px;justify-content:center;flex-wrap:wrap;margin:10px 0}.qty select{width:auto;flex:0 0 auto;padding:10px 8px;font-size:15px}.qty button{width:44px;height:44px;border-radius:99px;border:1px solid var(--b);background:var(--g);color:var(--t);font-size:22px;cursor:pointer}
+.missing-card{padding:8px}.missing-card img{opacity:.82}.missing-card .p{color:var(--m);font-weight:500}
+@media(prefers-reduced-motion:no-preference){.sh>.g{animation:up .22s ease-out}@keyframes up{from{transform:translateY(40px);opacity:0}}}
+:root{color-scheme:dark;--g:rgba(34,67,53,.72);--b:rgba(218,181,91,.28);--t:#f8f0d5;--m:#b9b99f;--a:#d7ad4c;--ok:#7bc79b;--w:#e5bf69;--r:#e88779;--forest:#102b24;--forest-deep:#071b17;--gold:#d7ad4c;--cream:#f8f0d5}body{color:var(--t);background:radial-gradient(circle at 12% -8%,rgba(75,121,88,.42),transparent 34%),radial-gradient(circle at 100% 18%,rgba(184,132,45,.16),transparent 30%),linear-gradient(145deg,#0b211b 0%,#071712 58%,#102c24 100%);letter-spacing:.01em}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;background-image:radial-gradient(rgba(255,255,255,.16) .6px,transparent .6px);background-size:7px 7px;mix-blend-mode:soft-light}main{padding-top:calc(env(safe-area-inset-top) + 76px)}h2,h3,#drawer h3{font-family:Georgia,"Times New Roman",serif;color:var(--cream)}h2{font-size:32px;letter-spacing:.015em;text-shadow:0 2px 18px rgba(0,0,0,.25)}h2:before{content:"\2726";color:var(--gold);font-size:.55em;vertical-align:.18em;margin-right:10px;text-shadow:0 0 12px rgba(215,173,76,.4)}.g{background:linear-gradient(145deg,rgba(30,73,56,.84),rgba(14,42,33,.78));border:1px solid var(--b);box-shadow:0 14px 34px rgba(0,0,0,.22),inset 0 1px rgba(255,244,194,.08)}.m{color:var(--m)}select,input{background:rgba(5,25,20,.55);border-color:rgba(215,173,76,.3);color:var(--cream);box-shadow:inset 0 1px rgba(255,255,255,.04)}select option,select optgroup{background:#102b24;color:var(--cream)}select:focus,input:focus,button:focus-visible{border-color:var(--gold);box-shadow:0 0 0 3px rgba(215,173,76,.14)}.btn{background:linear-gradient(135deg,#e1bd63,#b8892e);color:#17231c;box-shadow:0 5px 15px rgba(0,0,0,.2);font-family:Georgia,"Times New Roman",serif;letter-spacing:.02em}.btn.s{background:rgba(17,55,42,.7);border:1px solid rgba(215,173,76,.34);color:var(--cream)}.btn.d{background:rgba(139,54,44,.25);color:#f0a596}.cam{background:#020d0a;border:1px solid rgba(215,173,76,.5);box-shadow:0 16px 34px rgba(0,0,0,.32)}.guide{border-color:rgba(226,190,95,.85);box-shadow:0 0 0 999px rgba(2,14,10,.16),0 0 18px rgba(215,173,76,.2)}#st{background:rgba(5,25,20,.82);color:var(--cream);border:1px solid rgba(215,173,76,.22)}.chip{background:rgba(9,39,30,.7);border-color:rgba(215,173,76,.28)}.chip.on,nav button.on{background:linear-gradient(135deg,#e1bd63,#b8892e);border-color:var(--gold);color:#17231c}.tile{background:linear-gradient(145deg,rgba(36,83,62,.88),rgba(13,42,32,.9));border:1px solid rgba(215,173,76,.25);box-shadow:0 8px 20px rgba(0,0,0,.2)}.tile img{background:#0a2119}.tile b{font-family:Georgia,"Times New Roman",serif;color:var(--cream);font-weight:600}.tile .p{color:var(--ok)}.qb{background:var(--gold);color:#17231c}.pill.ok{background:rgba(123,199,155,.18);color:var(--ok)}.pill.w{background:rgba(229,191,105,.18);color:var(--w)}nav{background:rgba(7,29,22,.94);border-color:var(--b);box-shadow:10px 0 30px rgba(0,0,0,.32)}nav button{color:var(--m)}#menu-btn{top:calc(16px + env(safe-area-inset-top));left:16px;background:linear-gradient(135deg,#e1bd63,#b8892e);color:#17231c;border:1px solid rgba(255,239,174,.45);border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,.3);font-size:22px}#drawer{background:linear-gradient(165deg,#123b2d,#071d17);border-right:1px solid var(--b);box-shadow:8px 0 30px rgba(0,0,0,.42)}#drawer h3{font-size:26px}#drawer h3:before{content:"\2726";color:var(--gold);font-size:.7em;margin-right:8px}#drawer button{color:var(--cream)}.sh{background:rgba(0,8,5,.74)}.sh>.g{background:linear-gradient(145deg,#173e2f,#0b241b);color:var(--cream);border-color:var(--b)}.bar{background:rgba(255,255,255,.12)}.bar i{background:linear-gradient(90deg,#b8892e,#efd17a)}#toast{background:rgba(35,97,66,.8);border-color:rgba(123,199,155,.5)}#selbar{background:rgba(7,29,22,.92);border-color:var(--b)}@media(max-width:639px){main{padding-left:12px;padding-right:12px}.g{border-radius:18px}.row{gap:8px}.btn{min-height:46px}.cam{border-radius:20px}.grid{gap:9px}.tile{padding:7px;border-radius:14px}}\n</style><style>
+/* Decorative layer stays behind content and never captures touches. */
+body:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.42;background-image:radial-gradient(circle at 16% 23%,rgba(236,205,116,.9) 0 1px,transparent 1.8px),radial-gradient(circle at 82% 16%,rgba(236,205,116,.7) 0 1px,transparent 1.7px),radial-gradient(circle at 74% 78%,rgba(123,199,155,.65) 0 1px,transparent 1.8px),radial-gradient(circle at 24% 88%,rgba(236,205,116,.55) 0 1px,transparent 1.8px);background-size:180px 210px,240px 260px,210px 230px,260px 280px}
+body:before{background-image:radial-gradient(rgba(255,255,255,.16) .6px,transparent .6px),linear-gradient(115deg,transparent 46%,rgba(215,173,76,.08) 47%,transparent 48%),linear-gradient(65deg,transparent 46%,rgba(123,199,155,.06) 47%,transparent 48%);background-size:7px 7px,150px 150px,190px 190px}
+.g{position:relative;overflow:hidden}.g:after{content:"✦";position:absolute;right:12px;top:7px;color:rgba(236,205,116,.26);font-size:18px;pointer-events:none}.cam:after{content:"✧";position:absolute;right:18px;top:12px;color:rgba(236,205,116,.7);font-size:24px;pointer-events:none}
+.corner{position:fixed;z-index:0;width:clamp(118px,24vw,260px);height:clamp(118px,24vw,260px);pointer-events:none;opacity:.48;filter:drop-shadow(0 0 8px rgba(215,173,76,.16))}.corner svg{display:block;width:100%;height:100%;overflow:visible}.corner path{fill:none;stroke:rgba(215,173,76,.76);stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}.corner .leaf{fill:rgba(215,173,76,.2);stroke-width:1}.corner-tl{top:0;left:0}.corner-tr{top:0;right:0;transform:scaleX(-1)}.corner-bl{bottom:0;left:0;transform:scaleY(-1)}.corner-br{right:0;bottom:0;transform:scale(-1)}@media(max-width:639px){.corner{opacity:.3;width:112px;height:112px}}
+@media(prefers-reduced-motion:no-preference){body:after{animation:drift 18s ease-in-out infinite alternate}@keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(8px,-10px,0)}}}
+</style></head><body>
+<svg width="0" height="0" aria-hidden="true"><defs><g id="corner-vine"><path d="M8 8C52 8 78 14 104 39c22 21 34 48 35 82M9 20c34 0 57 7 77 27 15 15 23 34 24 59M24 9c0 30 7 52 27 71 15 14 34 22 59 24M53 13c-2 14 5 27 18 35 14 9 28 7 40-3M29 53c14-2 27 5 35 18 9 14 7 28-3 40M116 20c-7 12-5 24 6 34 10 9 23 10 35 3M20 116c12-7 24-5 34 6 9 10 10 23 3 35"/><path class="leaf" d="M91 29c8-8 17-7 21 1-7 6-14 6-21-1M29 91c-8 8-7 17 1 21 6-7 6-14-1-21M129 73c10-4 17 1 17 10-8 2-14-1-17-10M73 129c-4 10 1 17 10 17 2-8-1-14-10-17Z"/></g></defs></svg><div class="corner corner-tl" aria-hidden="true"><svg viewBox="0 0 180 180"><use href="#corner-vine"/></svg></div><div class="corner corner-tr" aria-hidden="true"><svg viewBox="0 0 180 180"><use href="#corner-vine"/></svg></div><div class="corner corner-bl" aria-hidden="true"><svg viewBox="0 0 180 180"><use href="#corner-vine"/></svg></div><div class="corner corner-br" aria-hidden="true"><svg viewBox="0 0 180 180"><use href="#corner-vine"/></svg></div>
+<main>
+<section id="v-scan">
+  <h2 id="ttl">Scansiona</h2>
+  <div class="g">
+    <div class="row"><select id="fl" aria-label="Lingua"></select><select id="fs" aria-label="Pacchetto"></select></div>
+    <div class="m">Auto cerca in tutte le lingue e in tutti i pacchetti. Scegline uno per restringere la ricerca.</div>
+  </div>
+  <div class="cam"><video id="vid" playsinline muted></video><canvas id="ov"></canvas><div class="guide"></div><div id="st">Avvio fotocamera</div></div>
+  <div class="row"><span class="m" id="zl" style="min-width:110px">Zoom 1.0×</span><input id="zoom" type="range" min="1" max="4" step="0.1" value="1" style="flex:1" aria-label="Zoom fotocamera"></div>
+  <div class="row"><button class="btn s" id="bfl" hidden>Flash: spento</button></div>
+  <div class="row"><button class="btn s" id="bbg">Sfondo vuoto: non memorizzato</button></div>
+  <div class="row"><button class="btn s" id="bsal">Salvataggio automatico: no</button><select id="cdef" aria-label="Condizione predefinita" style="max-width:110px"></select></div>
+  <div class="row"><button class="btn s" id="bauto">Scansione automatica: sì</button><button class="btn" id="bnow">Scansiona ora</button></div>
+  <div class="row"><label class="btn s" style="text-align:center">Da galleria<input id="gf" type="file" accept="image/*" hidden></label><button class="btn s" id="bcerca">Cerca per nome</button></div>
+</section>
+<section id="v-set" hidden><h2>Set</h2><div id="setbody"></div></section>
+<section id="v-miss" hidden><h2>Mancanti</h2><div class="m" style="margin:-4px 2px 18px">Solo i set per i quali possiedi almeno una carta.</div><div id="missbody"></div></section>
+<section id="v-sell" hidden><h2>Vendi</h2><div class="g"><div class="row"><button class="btn s" id="sellreload">Aggiorna</button><button class="btn s" id="sellbp">Scarica blueprint</button></div><div class="m">Sono mostrate solo le carte con almeno 2 copie identiche: stessa carta, lingua, condizione e finitura (non-foil, foil ed etched non si sommano). Una copia resta sempre in collezione.</div><div class="m" id="sellstat" style="margin-top:8px"></div><details style="margin-top:8px"><summary class="m">Diagnostica CardTrader</summary><button class="btn s" id="selldiag" style="margin-top:8px">Esegui diagnostica</button><pre class="m" id="selldiagout" style="white-space:pre-wrap;word-break:break-word"></pre></details></div><div id="sellbody"></div></section>
+<section id="v-coll" hidden>
+  <h2>Collezione</h2>
+  <div class="g"><div id="sum" style="font-size:20px;font-weight:700"></div>
+    <div class="row"><input id="cn" placeholder="Cerca per nome" type="search"><select id="cr"></select></div>
+    <div class="row"><input id="cmin" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Prezzo min"><input id="cmax" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Prezzo max"><select id="co"><option value="rec">Più recenti</option><option value="pd">Prezzo ↓</option><option value="pa">Prezzo ↑</option><option value="n">Nome</option></select></div>
+    <div class="row"><button class="btn s" id="bagg">Aggiorna prezzi</button><a class="btn s" href="/export.csv" style="text-align:center;text-decoration:none;color:inherit">Esporta Excel</a></div>
+    <div class="row"><select id="cc"><option value="">Tutte le condizioni</option><option value="NM">Near Mint</option><option value="LP">Lightly Played</option><option value="MP">Moderately Played</option><option value="HP">Heavily Played</option><option value="DMG">Danneggiata</option></select><button class="btn s" id="bbk">Backup ora</button></div>
+    <div class="row"><button class="btn s" id="bcarte">Aggiorna elenco carte</button></div><div class="m" id="stinfo"></div><div class="row"><a class="btn s" href="/logout" style="text-align:center;text-decoration:none;color:inherit">Esci</a></div><div class="row" id="adm-row" hidden><a class="btn s" href="/admin" style="text-align:center;text-decoration:none;color:inherit">Utenti e codici invito</a></div><div class="m" id="chi"></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+</main>
+<button id="menu-btn" aria-label="Apri menu" aria-expanded="false">☰</button>
+<aside id="drawer" aria-label="Menu principale">
+  <h3>Magicscan</h3>
+  <button id="n-scan" class="on">Scansiona</button>
+  <button id="n-prz">Prezzo</button>
+  <button id="n-set">Set</button>
+  <button id="n-miss">Mancanti</button>
+  <button id="n-sell" hidden>Vendi</button>
+  <button id="n-coll">Collezione</button>
+</aside>
+<div id="sheet" class="sh" hidden><div class="g" id="sb"></div></div>
+<div id="selbar" hidden><span id="selinfo"></span><button class="btn s" id="selall">Tutte</button><button class="btn d" id="seldel">Elimina</button></div>
+<div id="toast" hidden></div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const api=(u,o)=>fetch(u,o).then(async r=>{if(r.status===401){location='/login';throw 'sessione scaduta'}const t=await r.text();try{return JSON.parse(t)}catch(e){throw 'Il server ha risposto in modo non valido (codice '+r.status+')'}});
+const usd=v=>v==null?'—':'$ '+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const eur=(v,c)=>v==null?'—':v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+(c==='USD'?' $':' €');
+const S={tab:'scan',modo:'scan',gen:0,selMode:false,selIds:new Set(),cond:'NM',zd:1,hw:false,auto:true,fase:'cerca',assente:0,ferma:0,prev:null,cand:[],sel:0,man:false,righe:[],f:{langs:[],sets:[]},missingDetail:false};
+const COND=[['NM','Near Mint'],['LP','Lightly Played'],['MP','Moderately Played'],['HP','Heavily Played'],['DMG','Danneggiata']];
+const FIN=[['S','Non-foil'],['H','Foil'],['R','Etched']],FN=f=>(FIN.find(x=>x[0]===f)||['',''])[1],finOk=c=>(c&&c.fins&&c.fins.length)?c.fins:['S'];
+const LN=l=>(S.f.langs.find(x=>x.id===l)||{}).nome||l.toUpperCase();
+const imgU=(l,id)=>`/img/${l}/${encodeURIComponent(id)}`;
+let tt;function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,3200)}
+const stato=t=>$('#st').textContent=t;
+
+/* ---- navigazione ---- */
+function go(v){S.tab=v;S.selMode=false;S.selIds=new Set();$('#selbar').hidden=true;S.setSel=null;document.body.classList.remove('drawer-open');$('#menu-btn').setAttribute('aria-expanded','false');
+  for(const x of['scan','set','miss','sell','coll'])$('#v-'+x).hidden=x!==(v==='prz'?'scan':v);
+  for(const x of['scan','prz','set','miss','sell','coll'])$('#n-'+x).classList.toggle('on',x===v);
+  if(v==='scan'||v==='prz'){const cambio=S.modo!==v;S.modo=v;$('#ttl').textContent=v==='prz'?'Prezzo':'Scansiona';$('#bsal').parentElement.hidden=v==='prz';
+    if(cambio){$('#sheet').hidden=true;riparti()}
+    cam()}
+  else{fermaCam();caricaColl();if(v==='miss')caricaMancanti();if(v==='sell')caricaVendi()}}
+$('#n-scan').onclick=()=>go('scan');$('#n-prz').onclick=()=>go('prz');$('#n-set').onclick=()=>go('set');$('#n-miss').onclick=()=>go('miss');$('#n-sell').onclick=()=>go('sell');$('#n-coll').onclick=()=>go('coll');
+$('#menu-btn').onclick=()=>{const open=document.body.classList.toggle('drawer-open');$('#menu-btn').setAttribute('aria-expanded',String(open))};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)fermaCam();else if(camAttiva())cam()});      // app in secondo piano: fotocamera spenta
+
+/* ---- filtri lingua / pacchetto ---- */
+const NL=s=>/[^\x00-\u024F\u2010-\u206F]/.test(s);   // contiene lettere non europee (cinese, giapponese, coreano...)
+function fillSets(){const l=$('#fl').value,v=$('#fs').value;
+  const L=S.f.sets.filter(s=>!l||s.langs.includes(l)).map(s=>{const n=s.names[l]||s.names.en||Object.values(s.names)[0],c=l?(s.n[l]||0):Object.values(s.n).reduce((a,b)=>a+b,0);
+    return{id:s.id,n:NL(n)?s.id.toUpperCase()+' · '+c+' carte':n}}).sort((a,b)=>a.n.localeCompare(b.n));
+  $('#fs').innerHTML='<option value="">Pacchetto: auto (tutti)</option>'+L.map(s=>`<option value="${esc(s.id)}">${esc(s.n)}</option>`).join('');
+  if(L.some(s=>s.id===v))$('#fs').value=v}
+async function initFiltri(){S.f=await api('/api/filtri');
+  $('#fl').innerHTML='<option value="">Lingua: auto (tutte)</option>'+S.f.langs.map(l=>`<option value="${l.id}">${esc(l.nome)}</option>`).join('');fillSets()}
+$('#fl').onchange=fillSets;
+
+/* ---- fotocamera e scansione automatica ---- */
+const camAttiva=()=>S.tab==='scan'||S.tab==='prz';      // la fotocamera serve solo nelle schede Scansiona e Prezzo
+async function cam(){
+  if(S.stream||S.camBusy||!camAttiva())return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){stato('La fotocamera richiede HTTPS. Apri l\'indirizzo https:// oppure usa "Da galleria".');return}
+  const g=S.gen;S.camBusy=true;
+  try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    if(S.gen!==g||!camAttiva()){st.getTracks().forEach(t=>t.stop());return}      // nel frattempo si e' cambiata scheda: la fotocamera non deve partire
+    S.stream=st;const v=$('#vid');v.srcObject=st;await v.play();
+    if(S.gen!==g||!camAttiva()){fermaCam();return}
+    iniZoom();if(S.fase!=='conferma'&&S.fase!=='scansione')S.fase='cerca';S.ferma=0;S.prev=null;stato('Appoggia una carta davanti alla fotocamera');loop()}
+  catch(e){S.stream=null;stato('Fotocamera non disponibile ('+e.name+'). Consenti l\'accesso oppure usa "Da galleria".')}
+  finally{S.camBusy=false}}
+function fermaCam(){S.gen++;S.torch=false;clearTimeout(S.t);if(S.stream)S.stream.getTracks().forEach(t=>t.stop());S.stream=null}
+function iniFlash(cap){const b=$('#bfl');S.torch=false;b.hidden=!cap.torch;b.textContent='Flash: spento'}
+$('#bfl').onclick=async()=>{const t=S.stream&&S.stream.getVideoTracks()[0];if(!t)return;
+  try{await t.applyConstraints({advanced:[{torch:!S.torch}]});S.torch=!S.torch;$('#bfl').textContent='Flash: '+(S.torch?'acceso':'spento')}
+  catch(e){toast('Flash non disponibile su questa fotocamera');$('#bfl').hidden=true}};
+function iniZoom(){const s=$('#zoom'),t=S.stream&&S.stream.getVideoTracks()[0],cap=t&&t.getCapabilities?t.getCapabilities():{};
+  iniFlash(cap);S.hw=!!cap.zoom;if(S.hw){s.min=cap.zoom.min;s.max=Math.min(cap.zoom.max,8);s.step=cap.zoom.step||0.1}else{s.min=1;s.max=4;s.step=0.1}
+  const z=parseFloat(localStorage.getItem('zoom')||'1');s.value=Math.min(Math.max(z,+s.min),+s.max);applicaZoom(+s.value)}
+async function applicaZoom(z){S.zd=1;const v=$('#vid');v.style.transform='';
+  if(S.hw){try{await S.stream.getVideoTracks()[0].applyConstraints({advanced:[{zoom:z}]})}catch(e){S.hw=false}}
+  if(!S.hw){S.zd=z;if(z>1)v.style.transform='scale('+z+')'}
+  $('#zl').textContent='Zoom '+z.toFixed(1)+'×'+(S.hw?'':' (digitale)');localStorage.setItem('zoom',z)}
+$('#zoom').oninput=e=>applicaZoom(+e.target.value);
+function frame(maxw){const v=$('#vid'),z=S.zd||1,sw=v.videoWidth/z,sh=v.videoHeight/z,sx=(v.videoWidth-sw)/2,sy=(v.videoHeight-sh)/2,k=Math.min(1,maxw/sw),c=document.createElement('canvas');
+  c.width=Math.round(sw*k);c.height=Math.round(sh*k);c.getContext('2d').drawImage(v,sx,sy,sw,sh,0,0,c.width,c.height);
+  return new Promise(r=>c.toBlob(r,'image/jpeg',.88))}
+function disegna(q){const c=$('#ov'),b=c.getBoundingClientRect(),x=c.getContext('2d'),v=$('#vid');
+  c.width=b.width;c.height=b.height;x.clearRect(0,0,c.width,c.height);if(!q||!v.videoWidth)return;
+  const k=Math.max(b.width/v.videoWidth,b.height/v.videoHeight),ox=(b.width-v.videoWidth*k)/2,oy=(b.height-v.videoHeight*k)/2;
+  x.beginPath();q.forEach((p,i)=>{const X=p[0]*v.videoWidth*k+ox,Y=p[1]*v.videoHeight*k+oy;i?x.lineTo(X,Y):x.moveTo(X,Y)});
+  x.closePath();x.lineWidth=3;x.strokeStyle='#30d158';x.stroke()}
+S.bg=false;
+$('#bbg').onclick=async()=>{const b=$('#bbg');
+  try{if(S.bg){await fetch('/api/sfondo',{method:'DELETE'});S.bg=false;b.textContent='Sfondo vuoto: non memorizzato';return toast('Sfondo rimosso')}
+    if(!S.stream)return toast('Avvia prima la fotocamera, senza carte davanti');
+    const fd=new FormData();fd.append('foto',await frame(1280),'f.jpg');const r=await api('/api/sfondo',{method:'POST',body:fd});if(r.errore)throw r.errore;
+    S.bg=true;b.textContent='Sfondo memorizzato · tocca per rimuovere';toast('Sfondo memorizzato: non muovere piu\' telefono e zoom')}
+  catch(e){toast('Errore sfondo')}};
+const corr=(a,b)=>{const n=a.length,ma=a.reduce((s,x)=>s+x,0)/n,mb=b.reduce((s,x)=>s+x,0)/n;let sab=0,saa=0,sbb=0;
+  for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sab+=x*y;saa+=x*x;sbb+=y*y}return sab/Math.sqrt(saa*sbb||1)};
+S.sa=localStorage.getItem('sa')==='1';S.condDef=localStorage.getItem('cdef')||'NM';
+$('#cdef').innerHTML=COND.map(c=>`<option value="${c[0]}"${c[0]===S.condDef?' selected':''}>${c[0]}</option>`).join('');
+$('#cdef').onchange=e=>{S.condDef=e.target.value;localStorage.setItem('cdef',S.condDef)};
+$('#bsal').textContent='Salvataggio automatico: '+(S.sa?'sì':'no');
+$('#bsal').onclick=()=>{S.sa=!S.sa;localStorage.setItem('sa',S.sa?'1':'0');$('#bsal').textContent='Salvataggio automatico: '+(S.sa?'sì':'no')};
+async function salvaAuto(){const c=S.cand[0];
+  try{const r=await api('/api/salva',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({},c,{condiz:S.condDef,fin:finOk(c)[0],stato:S.stR,proposta:S.prop,pos:0}))});
+    toast('Salvata: '+c.nome+' · '+S.condDef+' · '+FN(finOk(c)[0])+(r.qta>1?' · ora ne hai '+r.qta:''));if(navigator.vibrate)navigator.vibrate(40)}
+  catch(e){toast('Errore nel salvataggio')}
+  riparti()}
+async function loop(){
+  if(!S.stream||!camAttiva())return;
+  try{if(S.auto&&(S.fase==='cerca'||S.fase==='attendi')){
+    const fd=new FormData();fd.append('foto',await frame(480),'f.jpg');
+    const d=await api('/api/rileva',{method:'POST',body:fd});if(!camAttiva()||!S.stream)return;
+    if(S.fase==='cerca'||S.fase==='attendi')disegna(d.quad);
+    if(S.fase==='attendi'){
+      if(d.trovata){S.assente=0;if(S.firma0&&d.firma&&corr(d.firma,S.firma0)<.93){S.fase='cerca';S.ferma=0;S.prev=null;stato('Nuova carta rilevata')}}
+      else if(++S.assente>=2){S.fase='cerca';S.ferma=0;S.prev=null;stato('Appoggia la prossima carta')}}
+    else if(!d.trovata){S.ferma=0;S.prev=null;stato('Appoggia una carta davanti alla fotocamera')}
+    else{S.firmaUlt=d.firma;const p=S.prev;S.prev=d.quad;
+      S.ferma=p&&d.quad.every((a,i)=>Math.abs(a[0]-p[i][0])<.02&&Math.abs(a[1]-p[i][1])<.02)?S.ferma+1:0;
+      stato(S.ferma?'Tieni ferma la carta…':'Carta rilevata');
+      if(S.ferma>=2)return scansiona(await tre())}}
+  }catch(e){}
+  S.t=setTimeout(loop,350)}
+$('#bauto').onclick=()=>{S.auto=!S.auto;$('#bauto').textContent='Scansione automatica: '+(S.auto?'sì':'no');if(!S.auto){disegna(null);stato('Premi "Scansiona ora"')}else{S.fase='cerca';S.ferma=0;clearTimeout(S.t);loop()}};
+$('#bnow').onclick=async()=>{if(!S.stream)return stato('Fotocamera non attiva: usa "Da galleria".');if(S.fase==='scansione'||S.fase==='conferma')return;clearTimeout(S.t);scansiona(await tre())};
+$('#gf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f){clearTimeout(S.t);scansiona(f)}};
+async function scansiona(blob){
+  if(!camAttiva())return;
+  S.firma0=S.firmaUlt;S.fase='scansione';stato('Riconoscimento in corso…');disegna(null);
+  const fd=new FormData();[].concat(blob).forEach((b,i)=>fd.append('foto',b,'f'+i+'.jpg'));fd.append('lang',$('#fl').value);fd.append('set',$('#fs').value);
+  try{const d=await api('/api/scan',{method:'POST',body:fd});if(d.errore)throw d.errore;if(!camAttiva())return;
+    S.lastBlob=[].concat(blob)[0];S.cand=d.candidati;S.prop=d.candidati[0].card_id;S.sel=0;S.man=false;S.stR=d.stato;if(S.modo!=='prz'&&S.sa&&d.stato==='ok')return salvaAuto();S.fase='conferma';renderConf();$('#sheet').hidden=false;if(navigator.vibrate)navigator.vibrate(40)}
+  catch(e){stato('Errore: '+e);riparti()}}
+function riparti(){S.fase=S.stream?'attendi':'cerca';S.assente=0;S.ferma=0;S.prev=null;if(S.stream&&S.auto){clearTimeout(S.t);S.t=setTimeout(loop,300)}}
+
+/* ---- conferma / correzione ---- */
+async function renderPrz(){const c=S.cand[S.sel],tok=S.przTok=(S.przTok||0)+1;
+  const testa=`<div class="top"><img class="big" src="${imgU(c.lang,c.card_id)}" alt=""><div><h3>${esc(c.nome)}</h3><div class="m">${esc(c.set)}<br>N. ${esc(c.numero)} · ${esc(LN(c.lang))}${c.senza_img?' · senza immagine':''}</div></div></div>`;
+  const piede=`<div class="row"><button class="btn" id="bpc">Chiudi</button><button class="btn s" id="bcor">Correggi</button></div><div id="alt"></div>`;
+  const mostra=corpo=>{if(tok!==S.przTok)return;$('#sb').innerHTML=testa+corpo+piede;$('#bpc').onclick=chiudi;$('#bcor').onclick=altri};
+  mostra('<div class="m" style="padding:14px 0">Cerco il prezzo…</div>');
+  let d;try{d=await api('/api/prezzo?card_id='+encodeURIComponent(c.card_id)+'&lang='+encodeURIComponent(c.lang))}catch(e){return mostra('<div class="m" style="padding:14px 0">Prezzo non disponibile: '+esc(e)+'</div>')}
+  const t=d.tcg||null,usate=t?COND.map(x=>x[0]).filter(x=>Object.values(t).some(r=>r[x]!=null)):[];let h='';
+  h+=t?`<div class="m" style="margin-top:12px">Prezzi TCGplayer via Scryfall (dollari, Near Mint)</div><table class="pt"><tr><th></th>${usate.map(x=>'<th>'+x+'</th>').join('')}</tr>${FIN.filter(f=>t[f[0]]).map(f=>`<tr><td>${f[1]}</td>${usate.map(x=>'<td>'+(t[f[0]][x]!=null?usd(t[f[0]][x]):'—')+'</td>').join('')}</tr>`).join('')}</table>`
+    :`<div class="m" style="margin-top:12px">Prezzi TCG: non disponibili${d.motivo?' ('+esc(d.motivo)+')':''}.</div>`;
+  const cm=d.cm||{},cmr=[['trend','Tendenza'],['low','Minimo'],['avg7','Media 7 g'],['avg30','Media 30 g']].filter(x=>cm[x[0]]!=null);
+  h+=cmr.length?`<div class="m" style="margin-top:12px">Cardmarket (euro)</div><table class="pt"><tr>${cmr.map(x=>'<th>'+x[1]+'</th>').join('')}</tr><tr>${cmr.map(x=>'<td>'+eur(cm[x[0]],'EUR')+'</td>').join('')}</tr></table>`:`<div class="m" style="margin-top:10px">Cardmarket: nessun prezzo disponibile.</div>`;
+  mostra(h)}
+function renderConf(){if(S.modo==='prz')return renderPrz();const c=S.cand[S.sel];const fo=finOk(c);if(!fo.includes(S.fin))S.fin=fo[0];
+  if(S.langKey!==c.card_id+'|'+c.lang){S.langKey=c.card_id+'|'+c.lang;S.langSel=(c.altra_lingua&&$('#fl').value)?$('#fl').value:c.lang}
+  const ls=S.langSel||c.lang,impOk=!!(S.lastBlob&&(c.senza_img||ls!==c.lang));
+  const pill=S.man?['i','Scelta manuale']:S.sel>0?['i','Alternativa']:S.stR==='ok'?['ok','Riconoscimento sicuro']:['w','Da verificare'];
+  $('#sb').innerHTML=`<div class="top"><img class="big" src="${imgU(ls,c.card_id)}" alt=""><div><h3>${esc(c.nome)}</h3>
+  <div class="m">${esc(c.set)}<br>N. ${esc(c.numero)} · ${esc(LN(ls))}</div><span class="pill ${pill[0]}">${pill[1]}</span></div></div>
+  ${c.altra_lingua||c.senza_img?`<div class="m" style="margin-top:10px">Lingua della carta${c.altra_lingua?' (Scryfall la elenca solo in '+esc(LN(c.lang))+')':''}</div><div class="row"><select id="cl" aria-label="Lingua della carta">${S.f.langs.map(l=>`<option value="${l.id}"${l.id===ls?' selected':''}>${esc(l.nome)}</option>`).join('')}</select></div>`:''}
+  ${impOk?`<label class="m" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="imp" checked style="width:auto"> Questa carta non ha un'immagine in questa lingua: usa la foto appena scattata per riconoscerla in futuro</label>`:''}
+  <div class="m" style="margin-top:10px">Condizione</div><div class="chips" id="cc2">${COND.map(c=>`<button class="chip${S.cond===c[0]?' on':''}" data-c="${c[0]}">${c[0]}</button>`).join('')}</div>
+  <div class="m" style="margin-top:6px">Finitura</div><div class="chips" id="ff2">${fo.map(f=>`<button class="chip${S.fin===f?' on':''}" data-f="${f}">${FN(f)}</button>`).join('')}</div>
+  <div class="row"><button class="btn" id="bok">Conferma</button><button class="btn s" id="bcor">Correggi</button></div>
+  <button class="lnk" id="bsc">Scarta</button><div id="alt"></div>`;
+  document.querySelectorAll('#cc2 .chip').forEach(b=>b.onclick=()=>{S.cond=b.dataset.c;document.querySelectorAll('#cc2 .chip').forEach(x=>x.classList.toggle('on',x===b))});
+  document.querySelectorAll('#ff2 .chip').forEach(b=>b.onclick=()=>{S.fin=b.dataset.f;document.querySelectorAll('#ff2 .chip').forEach(x=>x.classList.toggle('on',x===b))});
+  if($('#cl'))$('#cl').onchange=e=>{S.langSel=e.target.value;renderConf()};
+  $('#bok').onclick=conferma;$('#bcor').onclick=altri;$('#bsc').onclick=chiudi}
+function altri(){const a=S.cand.map((c,i)=>({c,i})).filter(x=>x.i!==S.sel);
+  $('#alt').innerHTML='<div class="m" style="margin:6px 0">Altre possibilità</div>'+a.map(x=>riga(x.c,'data-i="'+x.i+'"')).join('')+
+  '<input id="qn" placeholder="Cerca per nome" style="margin-top:10px" type="search"><div id="qr"></div>';
+  $('#alt').querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>{S.sel=+e.dataset.i;renderConf()});
+  let t;$('#qn').oninput=e=>{clearTimeout(t);t=setTimeout(()=>cerca(e.target.value),300)};$('#qn').focus()}
+const riga=(c,at)=>`<div class="alt" ${at}><img src="${imgU(c.lang,c.card_id)}" alt=""><div><b>${esc(c.nome)}</b><div class="m">${esc(c.set)} · N. ${esc(c.numero)} · ${esc(LN(c.lang))}${c.altra_lingua?' (non esiste in questa lingua)':''}${c.senza_img?' · senza immagine':''}</div></div></div>`;
+async function cerca(t){if(t.trim().length<2){$('#qr').innerHTML='';return}
+  const r=await api('/api/cerca?q='+encodeURIComponent(t)+'&lang='+$('#fl').value+'&set='+$('#fs').value);
+  $('#qr').innerHTML=r.length?r.map((c,i)=>riga(c,'data-r="'+i+'"')).join(''):'<div class="m" style="padding:8px 0">Nessun risultato'+($('#fl').value||$('#fs').value?' con i filtri attivi':'')+'.</div>';
+  $('#qr').querySelectorAll('[data-r]').forEach(e=>e.onclick=()=>{S.cand.unshift(r[+e.dataset.r]);S.sel=0;S.man=true;renderConf()})}
+async function conferma(){const c=S.cand[S.sel],ls=S.langSel||c.lang,imp=S.lastBlob&&(c.senza_img||ls!==c.lang)&&$('#imp')&&$('#imp').checked?S.lastBlob:null;$('#bok').disabled=true;$('#bok').textContent='Salvataggio…';
+  try{const r=await api('/api/salva',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({},c,{lang:ls,condiz:S.cond,fin:S.fin,stato:S.man?'manuale':S.sel>0?'corretto':S.stR,proposta:S.prop,pos:S.man?-1:S.sel}))});
+    toast('Salvata: '+c.nome+' · '+S.cond+' · '+FN(S.fin)+(r.qta>1?' · ora ne hai '+r.qta:''));
+    if(imp){const fd=new FormData();fd.append('foto',imp,'f.jpg');fd.append('card_id',c.card_id);fd.append('lang',ls);fd.append('nome',c.nome);fd.append('set',c.set);fd.append('numero',c.numero);
+      api('/api/impara',{method:'POST',body:fd}).then(x=>{if(x.errore)toast('Carta salvata, ma non imparata: '+x.errore);else toast('Carta imparata: da ora la riconosco con la fotocamera')}).catch(()=>toast('Carta salvata, ma non imparata'))}}catch(e){toast('Errore nel salvataggio')}
+  chiudi()}
+function chiudi(){S.lastBlob=null;S.langKey=null;S.cond='NM';S.fin=null;$('#sheet').hidden=true;if(S.fase==='conferma'||S.fase==='scansione')riparti()}
+$('#sheet').onclick=e=>{if(e.target.id==='sheet'){const d=S.det;S.det=null;d?$('#sheet').hidden=true:chiudi()}};
+$('#bcerca').onclick=()=>{S.lastBlob=null;S.cand=[];S.prop=null;S.man=true;S.fase='conferma';$('#sheet').hidden=false;
+  $('#sb').innerHTML='<h3>Cerca per nome</h3><input id="qn" placeholder="Nome della carta" type="search"><div id="qr"></div><button class="lnk" id="bsc">Chiudi</button>';
+  $('#bsc').onclick=chiudi;let t;$('#qn').oninput=e=>{clearTimeout(t);t=setTimeout(()=>cerca(e.target.value),300)};$('#qn').focus()};
+
+/* ---- collezione ---- */
+async function caricaColl(){const d=await api('/api/collezione');S.righe=d.righe;S.chiave=d.chiave;stInfo();
+  const v=$('#cr').value,R=[...new Set(S.righe.map(r=>r.rarita))].sort();
+  $('#cr').innerHTML='<option value="">Tutte le rarità</option>'+R.map(r=>`<option>${esc(r)}</option>`).join('');if(R.includes(v))$('#cr').value=v;grid();if(!$('#v-set').hidden)await caricaSet()}
+async function stInfo(){const s=await api('/api/stato'),f=d=>d?new Date(d).toLocaleDateString('it-IT'):'mai';
+  $('#stinfo').textContent='Elenco carte ('+s.totale+') aggiornato il '+f(s.carte)+(s.nuove?' · '+s.nuove+' nuove':'')+(s.in_corso?' · aggiornamento in corso…':'')+' · versione '+(s.versione||'?')+' · prezzi il '+f(s.prezzi)+' · backup '+f(s.backup)+(s.ric_tot?' · riconoscimento '+Math.round(100*s.ric_ok/s.ric_tot)+'% ('+s.ric_tot+' scansioni)':'')}
+$('#bcarte').onclick=async()=>{await api('/api/aggiorna-carte',{method:'POST'});toast('Verifica nuove carte avviata: può richiedere alcuni minuti');setTimeout(stInfo,4000)};
+function grid(){const n=$('#cn').value.toLowerCase(),r=$('#cr').value,mn=parseFloat($('#cmin').value),mx=parseFloat($('#cmax').value),o=$('#co').value;
+  const L=S.righe.filter(x=>(!n||x.nome.toLowerCase().includes(n))&&(!r||x.rarita===r)&&(!$('#cc').value||x.condiz===$('#cc').value)&&(isNaN(mn)||(x.usd??x.eur??0)>=mn)&&(isNaN(mx)||(x.usd??x.eur??0)<=mx));
+  if(o==='n')L.sort((a,b)=>a.nome.localeCompare(b.nome));
+  const G=new Map();L.forEach(x=>{const k=x.card_id+'|'+x.lang;if(!G.has(k))G.set(k,{rep:x,qta:0,usd:0,eur:0,ok:false,okU:false,okE:false});const g=G.get(k);g.qta+=x.qta;if(x.usd!=null){g.usd+=x.usd*x.qta;g.ok=g.okU=true}else if(x.eur!=null){g.eur+=x.eur*x.qta;g.ok=g.okE=true}});
+  const gl=[...G.values()];if(o==='pd')gl.sort((a,b)=>(b.ok?b.usd+b.eur:-1)-(a.ok?a.usd+a.eur:-1));if(o==='pa')gl.sort((a,b)=>(a.ok?a.usd+a.eur:1e9)-(b.ok?b.usd+b.eur:1e9));
+  const tot=gl.reduce((s,g)=>s+g.usd,0),toteur=gl.reduce((s,g)=>s+g.eur,0),pz=L.reduce((s,x)=>s+x.qta,0),sp=L.filter(x=>x.usd==null&&x.eur==null).reduce((s,x)=>s+x.qta,0);
+  $('#sum').textContent=S.righe.length?pz+' carte · '+usd(tot)+(toteur?' + '+eur(toteur,'EUR')+' (Cardmarket)':'')+(S.chiave?(sp?' · '+sp+' senza prezzo':''):' · chiave JustTCG non impostata'):'Nessuna carta';
+  $('#grid').innerHTML=gl.length?gl.map(g=>`<div class="g tile" data-id="${g.rep.id}"><img loading="lazy" src="${imgU(g.rep.lang,g.rep.card_id)}" alt="">${g.qta>1?'<span class="qb">×'+g.qta+'</span>':''}<b>${esc(g.rep.nome)}</b><span class="p">${fmtP(g)}</span></div>`).join(''):
+    '<div class="m" style="grid-column:1/-1;text-align:center;padding:30px">'+(S.righe.length?'Nessuna carta con questi filtri.':'La collezione è vuota. Scansiona la tua prima carta.')+'</div>';
+  document.querySelectorAll('.tile').forEach(e=>e.onclick=()=>dettaglio(+e.dataset.id))}
+['cn','cmin','cmax'].forEach(i=>$('#'+i).oninput=grid);['cr','co','cc'].forEach(i=>$('#'+i).onchange=grid);
+$('#bagg').onclick=async()=>{const r=await api('/api/aggiorna',{method:'POST'});toast(r&&r.avviato===false?r.messaggio:'Aggiornamento prezzi avviato: ricarica tra un minuto')};
+const CC={NM:'#30d158',LP:'#0a84ff',MP:'#ff9f0a',HP:'#ff453a',DMG:'#bf5af2'};
+const DASH={S:'',H:'7 4',R:'2 4'};
+/*GR-INIZIO*/
+/* Grafico prezzi: linee pulite (niente puntini), intervallo 7g/30g/90g/Tutto, legenda che accende/spegne le serie,
+   griglia con prezzi e date, e lettura del prezzo toccando o passando sul grafico. */
+const RNG=[['7','7 g'],['30','30 g'],['90','90 g'],['0','Tutto']];
+S.gr={r:'0',h:{}};S.grFmt=v=>usd(v);
+const grLab=k=>k==='CM|'?'Cardmarket':k.split('|')[0]+(k.split('|')[1]?' · '+FN(k.split('|')[1]):'');
+const grCol=k=>k==='CM|'?'#0a84ff':CC[k.split('|')[0]]||'#8e8e93';
+const grPx=v=>v>=100?v.toFixed(0):v>=10?v.toFixed(1):v.toFixed(2);
+const grDt=(t,l)=>new Date(t).toLocaleDateString('it-IT',l?{day:'numeric',month:'short',year:'2-digit'}:{day:'numeric',month:'short'});
+function grDown(p,n=60){if(p.length<=n)return p;const r=[],b=p.length/n;for(let i=0;i<n;i++){const a=p.slice(Math.round(i*b),Math.round((i+1)*b));if(a.length)r.push({giorno:a[a.length-1].giorno,valore:a.reduce((s,x)=>s+x.valore,0)/a.length})}return r}
+function grNice(x){const p=Math.pow(10,Math.floor(Math.log10(x))),f=x/p;return(f<=1?1:f<=2?2:f<=5?5:10)*p}
+function grSet(serie,fmt){S.grS=serie;S.grFmt=fmt||(v=>usd(v));S.gr.h={};S.gr.r=Object.values(serie).some(s=>s.length>45)?'30':'0'}
+function grHtml(){const D=S.grS,g=S.gr,ks=Object.keys(D).filter(k=>D[k].length),T=x=>Date.parse(x.giorno),fin=Math.max(...ks.flatMap(k=>D[k].map(T))),
+  ini=g.r==='0'?-Infinity:fin-(+g.r)*864e5;
+  let ser=ks.map(k=>({k,p:D[k].filter(x=>T(x)>=ini)}));if(ser.every(s=>s.p.length<2)){g.r='0';ser=ks.map(k=>({k,p:D[k]}))}
+  const vis=ser.filter(s=>!g.h[s.k]&&s.p.length),W=340,H=190,pl=46,pr=14,pt=10,pb=24;
+  const vals=vis.flatMap(s=>s.p.map(x=>x.valore)),ts=vis.flatMap(s=>s.p.map(T));
+  let body='',tip='Tocca o scorri sul grafico per leggere i prezzi';
+  if(vals.length){const mn=Math.min(...vals),mx=Math.max(...vals),pad=((mx-mn)||mx*.1||1)*.12,lo=Math.max(0,mn-pad),hi=mx+pad,st=grNice((hi-lo)/3),
+    t0=Math.min(...ts),t1=Math.max(...ts),tr=(t1-t0)||1,X=t=>pl+(t-t0)/tr*(W-pl-pr),Y=a=>H-pb-(a-lo)/((hi-lo)||1)*(H-pb-pt);S.grG={t0,t1,pl,pr,W,vis};
+    let grid='';for(let v=Math.ceil(lo/st)*st;v<=hi+1e-9;v+=st)grid+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="rgba(255,255,255,.1)"/><text x="${pl-5}" y="${(Y(v)+3.5).toFixed(1)}" text-anchor="end">${grPx(v)}</text>`;
+    const nx=t1>t0?4:1;let xl='';for(let i=0;i<nx;i++){const t=nx>1?t0+tr*i/(nx-1):t0;xl+=`<text x="${X(t).toFixed(1)}" y="${H-7}" text-anchor="${i===0?'start':i===nx-1&&nx>1?'end':'middle'}">${grDt(t)}</text>`}
+    const L=vis.map(s=>{const p=grDown(s.p),c=grCol(s.k),dsh=DASH[s.k.split('|')[1]]||'',last=p[p.length-1];
+      return(p.length>1?`<polyline points="${p.map(x=>X(T(x)).toFixed(1)+','+Y(x.valore).toFixed(1)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.2" stroke-dasharray="${dsh}" stroke-linejoin="round" stroke-linecap="round"/>`:'')+
+      `<circle cx="${X(T(last)).toFixed(1)}" cy="${Y(last.valore).toFixed(1)}" r="4" fill="${c}" stroke="#000" stroke-width="1.5"/>`}).join('');
+    body=`<svg id="grsvg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Grafico prezzi" style="touch-action:pan-y;display:block"><g fill="#8e8e93" font-size="10">${grid}${xl}</g>${L}<line id="grcr" y1="${pt}" y2="${H-pb}" stroke="#fff" stroke-opacity=".5" visibility="hidden"/></svg>`}
+  else body='<div class="m" style="padding:30px 0;text-align:center">Nessuna serie visibile: tocca la legenda per riattivarle.</div>';
+  const leg=ser.map(s=>{const f=s.p[0],l=s.p[s.p.length-1],c=grCol(s.k),ch=f&&l&&s.p.length>1&&f.valore?(l.valore-f.valore)/f.valore*100:null,dsh=DASH[s.k.split('|')[1]]||'';
+    return`<button class="chip" data-k="${s.k}" style="flex:1 1 44%;font-size:12px;padding:8px 6px;opacity:${g.h[s.k]?.35:1};display:flex;gap:6px;align-items:center;justify-content:center"><svg width="20" height="8"><line x1="1" x2="19" y1="4" y2="4" stroke="${c}" stroke-width="3" stroke-dasharray="${dsh}" stroke-linecap="round"/></svg><span>${grLab(s.k)}</span><b>${l?S.grFmt(l.valore):'—'}</b>${ch==null?'':`<span style="color:${ch>=0?'#30d158':'#ff453a'}">${ch>=0?'+':''}${ch.toFixed(0)}%</span>`}</button>`}).join('');
+  return`<div class="chips" id="grr" style="margin:8px 0 4px">${RNG.map(r=>`<button class="chip${g.r===r[0]?' on':''}" data-r="${r[0]}" style="padding:7px 0;font-size:13px">${r[1]}</button>`).join('')}</div>
+  <div class="m" id="gtip" style="min-height:34px;font-size:13px;line-height:1.35">${tip}</div>${body}<div class="chips" id="grl" style="margin:8px 0 0">${leg}</div>`}
+function disegnaGr(){const el=$('#gtcg');if(!el)return;el.innerHTML=grHtml();
+  el.querySelectorAll('#grr .chip').forEach(b=>b.onclick=()=>{S.gr.r=b.dataset.r;disegnaGr()});
+  el.querySelectorAll('#grl .chip').forEach(b=>b.onclick=()=>{S.gr.h[b.dataset.k]=!S.gr.h[b.dataset.k];disegnaGr()});
+  const sv=$('#grsvg');if(!sv||!S.grG)return;const G=S.grG,cr=$('#grcr'),tp=$('#gtip');
+  const mv=e=>{const r=sv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*G.W,t=G.t0+Math.min(1,Math.max(0,(x-G.pl)/(G.W-G.pl-G.pr)))*(G.t1-G.t0);
+    const rows=G.vis.map(s=>{let b=null;for(const p of s.p){if(b===null||Math.abs(Date.parse(p.giorno)-t)<Math.abs(Date.parse(b.giorno)-t))b=p}return b&&{s,b}}).filter(Boolean);if(!rows.length)return;
+    const tt=Date.parse(rows[0].b.giorno),cx=G.pl+(tt-G.t0)/((G.t1-G.t0)||1)*(G.W-G.pl-G.pr);cr.setAttribute('x1',cx);cr.setAttribute('x2',cx);cr.setAttribute('visibility','visible');
+    tp.innerHTML='<b>'+grDt(tt,1)+'</b> · '+rows.map(o=>`<span style="color:${grCol(o.s.k)}">${grLab(o.s.k)}</span> ${S.grFmt(o.b.valore)}`).join(' · ')};
+  sv.addEventListener('pointerdown',mv);sv.addEventListener('pointermove',mv);sv.addEventListener('pointerleave',()=>{cr.setAttribute('visibility','hidden')})}
+function grafico(P){if(P.length<2)return'<div class="m" style="padding:14px 0">Lo storico si costruisce un giorno alla volta: servono almeno due rilevazioni.</div>';
+  grSet({'CM|':P.map(x=>({giorno:x.giorno,valore:x.valore}))},v=>eur(v,'EUR'));return'<div class="m" style="margin-top:12px">Storico Cardmarket in euro</div><div id="gtcg"></div>'}
+function graficoTcg(serie){const ks=Object.keys(serie).filter(k=>serie[k].length>1);if(!ks.length)return null;grSet(serie);
+  return'<div class="m" style="margin-top:12px">Prezzo TCGplayer in USD (Scryfall, Near Mint): una linea per finitura (tratteggio diverso per Foil ed Etched)</div><div id="gtcg"></div>'}
+/*GR-FINE*/
+async function dettaglio(id){const x=S.righe.find(r=>r.id===id);if(!x)return;S.det=id;
+  const G=S.righe.filter(r=>r.card_id===x.card_id&&r.lang===x.lang).sort((a,b)=>COND.findIndex(c=>c[0]===a.condiz)-COND.findIndex(c=>c[0]===b.condiz)||'SHR'.indexOf(a.fin||'S')-'SHR'.indexOf(b.fin||'S'));
+  const [T,P]=await Promise.all([api('/api/tcg/'+encodeURIComponent(x.card_id)),api('/api/storico/'+encodeURIComponent(x.card_id))]);
+  const n=G.reduce((s,r)=>s+r.qta,0),tot=G.reduce((s,r)=>s+(r.usd||0)*r.qta,0),toteur=G.reduce((s,r)=>s+(r.usd==null&&r.eur!=null?r.eur*r.qta:0),0),gt=graficoTcg(T.serie||{});
+  $('#sb').innerHTML=`<div class="top"><img class="big" src="${imgU(x.lang,x.card_id)}" alt=""><div><h3>${esc(x.nome)}</h3><div class="m">${esc(x.set_nome)}<br>N. ${esc(x.numero)} · ${esc(LN(x.lang))}</div>
+  <span class="pill i">${esc(x.rarita)}</span><div style="font-size:26px;font-weight:700;margin-top:8px">${G.some(r=>r.usd!=null)?usd(tot)+(toteur?' + '+eur(toteur,'EUR')+' CM':''):toteur?eur(toteur,'EUR')+' CM':'—'}</div><div class="m">${n} ${n>1?'copie':'copia'}</div></div></div>
+  ${G.map(r=>`<div class="qty" data-r="${r.id}"><select class="cs" aria-label="Condizione">${COND.map(c=>`<option value="${c[0]}"${c[0]===r.condiz?' selected':''}>${c[0]}</option>`).join('')}</select><select class="fs" aria-label="Finitura">${r.fin?'':'<option value="" selected>Auto</option>'}${FIN.map(f=>`<option value="${f[0]}"${f[0]===r.fin?' selected':''}>${f[1]}</option>`).join('')}</select><button class="qm" aria-label="Meno">−</button><b>${r.qta}×</b><button class="qp" aria-label="Più">+</button><span class="m" style="min-width:76px;text-align:right">${r.usd!=null?usd(r.usd):r.eur!=null?eur(r.eur,'EUR')+' CM':'—'}</span><button class="xd" aria-label="Elimina">✕</button></div>`).join('')}
+  ${gt||(T.collegata?'<div class="m" style="padding:14px 0">Storico TCG in costruzione: servono almeno due rilevazioni.</div>':'<div class="m" style="padding:10px 0">Prezzo TCG non disponibile per questa carta: mostro lo storico Cardmarket (€).</div>'+grafico(P))}
+  <div class="row"><button class="btn s" id="bcl">Chiudi</button></div>`;
+  $('#sheet').hidden=false;disegnaGr();$('#bcl').onclick=()=>{S.det=null;$('#sheet').hidden=true};
+  const rim=async f=>{await f();await caricaColl();const y=S.righe.find(r=>r.card_id===x.card_id&&r.lang===x.lang);y?dettaglio(y.id):(S.det=null,$('#sheet').hidden=true)},J={'Content-Type':'application/json'};
+  document.querySelectorAll('#sb .qty').forEach(e=>{const i=+e.dataset.r,r=G.find(g=>g.id===i);
+    e.querySelector('.cs').onchange=ev=>rim(()=>api('/api/condizione/'+i,{method:'POST',headers:J,body:JSON.stringify({c:ev.target.value})}));
+    e.querySelector('.fs').onchange=ev=>{if(ev.target.value)rim(()=>api('/api/finitura/'+i,{method:'POST',headers:J,body:JSON.stringify({f:ev.target.value})}))};
+    e.querySelector('.qm').onclick=()=>rim(()=>api('/api/qta/'+i,{method:'POST',headers:J,body:'{"d":-1}'}));
+    e.querySelector('.qp').onclick=()=>rim(()=>api('/api/qta/'+i,{method:'POST',headers:J,body:'{"d":1}'}));
+    e.querySelector('.xd').onclick=()=>{if(confirm('Eliminare '+x.nome+' ('+r.condiz+(r.fin?' · '+FN(r.fin):'')+') dalla collezione?'))rim(()=>fetch('/api/carta/'+i,{method:'DELETE'}))}})}
+
+const sidOf=id=>id.slice(0,id.lastIndexOf('-'));
+const fmtP=g=>g.okU&&g.okE?usd(g.usd)+' + '+eur(g.eur,'EUR'):g.okU?usd(g.usd):g.okE?eur(g.eur,'EUR')+' CM':'—';
+const tile=(x,sel)=>`<div class="g tile${sel?' sel':''}" data-id="${x.id}">${sel?'<span class="ck">✓</span>':''}<img loading="lazy" src="${imgU(x.lang,x.card_id)}" alt="">${x.qta>1?'<span class="qb">×'+x.qta+'</span>':''}<b>${esc(x.nome)}</b><span class="p">${x.usd!=null?usd(x.usd):x.eur!=null?eur(x.eur,'EUR')+' CM':'—'}</span></div>`;
+const bindTiles=el=>el.querySelectorAll('.tile[data-id]').forEach(e=>e.onclick=()=>{const id=+e.dataset.id;if(S.selMode){S.selIds.has(id)?S.selIds.delete(id):S.selIds.add(id);renderSet()}else dettaglio(id)});
+const lg=s=>{const fb=s.img?`<img src="${esc(s.img)}" alt="" loading="lazy">`:`<span class="m">${esc(s.nome)}</span>`;
+  return s.logo?`<img src="${esc(s.logo)}" alt="" loading="lazy" onerror="this.outerHTML=this.nextElementSibling.innerHTML"><template>${fb}</template>`:fb};
+const prog=s=>`<div class="bar"><i style="width:${s.totale?Math.min(100,100*s.possedute/s.totale):0}%"></i></div>`;
+async function caricaSet(t=0){S.sets=await api('/api/set');renderSet();
+  if(S.sets.some(s=>s.totale==null||s.approx||(!s.logo))&&t<3)setTimeout(()=>{if(!$('#v-set').hidden)caricaSet(t+1)},5000)}
+function renderSet(){const el=$('#setbody');
+  if(S.setSel){const s=S.sets.find(x=>x.sid+'|'+x.lang===S.setSel);if(!s){S.setSel=null;return renderSet()}
+    const L=S.righe.filter(x=>sidOf(x.card_id)===s.sid&&x.lang===s.lang).sort((a,b)=>String(a.numero).localeCompare(String(b.numero),undefined,{numeric:true}));
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px"><button class="btn s" id="sback" style="width:auto;padding:10px 16px">‹ Tutti i set</button><button class="btn s" id="bsel" style="width:auto;padding:10px 16px">${S.selMode?'Fine selezione':'Seleziona'}</button></div>
+    <div class="g" style="margin-top:12px;text-align:center"><div class="lg" style="height:110px">${lg(s)}</div><div style="font-size:24px;font-weight:700;margin-top:6px">${s.possedute}/${s.totale??'?'}</div>
+    <div class="m">${esc(s.nome)} · ${esc(LN(s.lang))} · ${s.copie} ${s.copie>1?'copie':'copia'}${s.approx?' · totale stimato dall\'elenco carte':''}</div>${prog(s)}</div><div class="grid">${L.map(x=>tile(x,S.selMode&&S.selIds.has(x.id))).join('')}</div>`;
+    S.curIds=L.map(x=>x.id);
+    $('#sback').onclick=()=>{S.setSel=null;S.selMode=false;S.selIds=new Set();renderSet()};$('#bsel').onclick=()=>{S.selMode=!S.selMode;S.selIds=new Set();renderSet()};bindTiles(el);selBar();return}
+  el.innerHTML=S.sets.length?`<div class="grid sgrid">${S.sets.map(s=>`<div class="g tile st" data-k="${esc(s.sid+'|'+s.lang)}"><div class="lg">${lg(s)}</div><b>${esc(s.nome)}</b><span class="p">${s.possedute}/${s.totale??'?'}</span> <span class="m">${esc(LN(s.lang))}</span>${prog(s)}</div>`).join('')}</div>`:'<div class="m" style="text-align:center;padding:30px">Nessun set: salva prima qualche carta.</div>';
+  el.querySelectorAll('.st').forEach(e=>e.onclick=()=>{S.setSel=e.dataset.k;S.selMode=false;S.selIds=new Set();renderSet();scrollTo(0,0)});selBar()}
+async function caricaMancanti(t=0){S.missingDetail=false;const el=$('#missbody');el.innerHTML='<div class="m" style="text-align:center;padding:30px">Caricamento…</div>';
+  try{S.mancanti=await api('/api/mancanti');if(S.missingDetail||$('#v-miss').hidden)return;renderMancanti();
+    if(S.mancanti.some(s=>!s.logo)&&t<3)setTimeout(()=>{if(!$('#v-miss').hidden&&!S.missingDetail)caricaMancanti(t+1)},5000)
+  }catch(e){el.innerHTML='<div class="m" style="text-align:center;padding:30px">Errore nel caricamento: '+esc(e)+'</div>'}}
+function renderMancanti(){const el=$('#missbody');
+  if(!S.mancanti.length){el.innerHTML='<div class="m" style="text-align:center;padding:30px">Nessuna carta mancante nei set presenti.</div>';return}
+  el.innerHTML='<div class="grid sgrid">'+S.mancanti.map(s=>`<div class="g tile missing-set" data-k="${esc(s.sid+'|'+s.lang)}"><div class="lg">${lg(s)}</div><b>${esc(s.nome)}</b><span class="p">${s.possedute}/${s.totale} · ${s.mancanti} mancanti</span><div class="bar"><i style="width:${s.totale?Math.min(100,100*s.possedute/s.totale):0}%"></i></div></div>`).join('')+'</div>';
+  el.querySelectorAll('.missing-set').forEach(e=>e.onclick=()=>{const s=S.mancanti.find(x=>x.sid+'|'+x.lang===e.dataset.k);if(!s)return;S.missingDetail=true;
+  el.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px"><button class="btn s" id="mback" style="width:auto;padding:10px 16px">‹ Tutti i set</button></div><div class="g" style="margin-top:12px;text-align:center"><div class="lg" style="height:110px">${lg(s)}</div><div style="font-size:24px;font-weight:700;margin-top:6px">${s.mancanti}</div><div class="m">${esc(s.nome)} · ${esc(LN(s.lang))} · carte mancanti</div></div><div class="grid">${s.cards.map((c,i)=>`<div class="g tile missing-card" data-mi="${i}"><img loading="lazy" src="${imgU(c.lang,c.card_id)}" alt=""><b>${esc(c.nome)}</b><span class="p">N. ${esc(c.numero)} · ${esc(c.rarita)}</span></div>`).join('')}</div>`;
+  $('#mback').onclick=()=>{S.missingDetail=false;renderMancanti()};
+  el.querySelectorAll('.missing-card').forEach(e=>e.onclick=()=>{const c=s.cards[+e.dataset.mi];S.cand=[c];S.sel=0;S.modo='prz';$('#sheet').hidden=false;renderPrz()});
+  scrollTo(0,0)})
+}
+const money=(v,c)=>{try{return v.toLocaleString('it-IT',{style:'currency',currency:c||'EUR'})}catch(e){return eur(v,c)}};
+let vendiPolling=false,vendiRenderKey='';
+function vendiStato(d){let t='';
+  if(!d.configurato)t='Token CardTrader non configurato: segui la sezione “Token CardTrader” di DEPLOYMENT.md.';
+  else{const s=d.stato||{};
+    if(d.blueprint_in_corso)t='Download blueprint in corso… '+s.fatte+'/'+s.tot+' carte controllate, '+s.ok+' collegate.';
+    else if(d.prezzi_in_corso)t='Recupero prezzi CardTrader… '+d.prezzi.fatte+'/'+d.prezzi.tot;
+    else if(s.tot)t='Blueprint: '+s.ok+' collegate, '+s.mancanti+' non trovate, '+s.ambigui+' ambigue'+(s.errori?', '+s.errori+' con errore':'')+'.';
+    if(d.errore_ct)t+=(t?' ':'')+'Errore: '+d.errore_ct}
+  $('#sellstat').textContent=t}
+async function caricaVendi(poll=false){const el=$('#sellbody');if(!poll&&!S.vendi)el.innerHTML='<div class="m" style="text-align:center;padding:30px">Caricamento…</div>';
+  try{const d=await api('/api/vendi');if(d.errore)throw d.errore;vendiStato(d);const key=JSON.stringify(d.righe),editing=poll&&el.contains(document.activeElement)&&document.activeElement!==document.body;
+    if(key!==vendiRenderKey&&!editing){S.vendi=d.righe;vendiRenderKey=key;renderVendi()}
+    if((d.blueprint_in_corso||d.prezzi_in_corso)&&!vendiPolling){vendiPolling=true;setTimeout(async()=>{vendiPolling=false;if(!$('#v-sell').hidden)await caricaVendi(true)},4000)}
+  }catch(e){if(!poll)el.innerHTML='<div class="m" style="text-align:center;padding:30px">Errore: '+esc(e)+'</div>'}}
+function renderVendi(){const el=$('#sellbody'),L=S.vendi||[];
+  if(!L.length){el.innerHTML='<div class="m" style="text-align:center;padding:30px">Nessuna carta con 2 o più copie identiche.</div>';return}
+  el.innerHTML='<div class="grid">'+L.map((x,i)=>{
+    const bp=x.blueprint_id?`<span class="m">Blueprint ${x.blueprint_id}${x.match==='nome'?' · collegata solo per nome: controlla che sia la carta giusta':''}</span>`
+      :`<span class="m" style="color:var(--w)">Blueprint non trovato${x.mapping_motivo?': '+esc(x.mapping_motivo):' (ricerca in corso o non ancora eseguita)'}</span>`
+      +(x.candidati&&x.candidati.length?`<select class="sell-cand" data-i="${i}" style="margin-top:6px">${x.candidati.map(c=>`<option value="${c.id}">${esc([c.id,c.nome,c.version,c.numero,c.espansione].filter(Boolean).join(' · '))}</option>`).join('')}</select><button class="btn s sell-link" data-i="${i}" style="margin-top:6px">Collega questo blueprint</button>`:'');
+    const pr=!x.blueprint_id?'':x.prezzo_consigliato!=null?`<span class="p">Prezzo consigliato CardTrader: ${money(x.prezzo_consigliato,x.valuta)}</span><span class="m">${esc(x.prezzo_info||'')}${x.offerte?' · '+x.offerte+(x.offerte>1?' offerte':' offerta'):''}</span>`
+      :`<span class="m">${x.prezzo_errore?'Prezzo consigliato non disponibile: '+esc(x.prezzo_errore):'Prezzo consigliato in recupero…'}</span>`;
+    return `<div class="g tile sell-card"><img loading="lazy" src="${x.img}" alt=""><b>${esc(x.nome)}</b><span class="m">${esc(x.set)} · N. ${esc(x.numero)} · ${esc(LN(x.lang))}</span><span class="m">${esc(x.condiz)}${x.fin?' · '+esc(FN(x.fin)):''} · ${x.qta} copie</span>${bp}${pr}`
+      +(x.blueprint_id?`<div class="row" style="margin:8px 0 0"><label class="m" style="flex:1">Quantità da vendere<select class="sell-qty" data-i="${i}" style="margin-top:4px">${Array.from({length:x.qta-1},(_,n)=>`<option value="${n+1}">${n+1}</option>`).join('')}</select></label><label class="m" style="flex:1">Prezzo ${esc(x.valuta||'€')}<input class="sell-price" data-i="${i}" type="number" min="0.01" step="0.01" value="${x.prezzo_consigliato??''}" placeholder="Prezzo"></label></div><button class="btn sell-publish" data-i="${i}">Pubblica</button>`:'')+'</div>'}).join('')+'</div>';
+  el.querySelectorAll('.sell-publish').forEach(b=>b.onclick=async()=>{const x=L[+b.dataset.i],price=+el.querySelector(`.sell-price[data-i="${b.dataset.i}"]`).value,quantity=+el.querySelector(`.sell-qty[data-i="${b.dataset.i}"]`).value;if(!price||!quantity)return toast('Inserisci prezzo e quantità validi');if(!confirm('Pubblicare '+quantity+' copie di '+x.nome+' a '+price.toFixed(2)+' su CardTrader?'))return;b.disabled=true;b.textContent='Invio…';
+    try{const r=await api('/api/vendi/pubblica',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({card_id:x.card_id,lang:x.lang,fin:x.fin,condiz:x.condiz,blueprint_id:x.blueprint_id,quantity,price})});if(r.errore)throw r.errore;toast('Annuncio pubblicato su CardTrader'+(r.avvisi&&Object.keys(r.avvisi).length?' (con avvisi)':''));b.textContent='Pubblicato'}catch(e){toast('Errore CardTrader: '+e);b.disabled=false;b.textContent='Pubblica'}});
+  el.querySelectorAll('.sell-link').forEach(b=>b.onclick=async()=>{const x=L[+b.dataset.i],id=el.querySelector(`.sell-cand[data-i="${b.dataset.i}"]`).value;b.disabled=true;
+    try{const r=await api('/api/vendi/mappa',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({card_id:x.card_id,blueprint_id:id})});if(r.errore)throw r.errore;toast('Blueprint collegato');vendiRenderKey='';await caricaVendi()}catch(e){toast('Errore: '+e);b.disabled=false}});
+}
+$('#sellreload').onclick=()=>caricaVendi();
+$('#sellbp').onclick=async()=>{try{const r=await api('/api/vendi/blueprint',{method:'POST'});if(r.errore)throw r.errore;toast('Download dei blueprint avviato');vendiRenderKey='';await caricaVendi()}catch(e){toast('Errore: '+e)}};
+$('#selldiag').onclick=async()=>{const o=$('#selldiagout');o.textContent='Controllo…';try{o.textContent=JSON.stringify(await api('/api/vendi/diagnostica'),null,1)}catch(e){o.textContent='Errore: '+e}};
+function selBar(){const on=S.selMode&&!!S.setSel;$('#selbar').hidden=!on;if(on){const n=[...S.selIds].reduce((a,i)=>a+((S.righe.find(r=>r.id===i)||{}).qta||0),0);$('#selinfo').textContent=S.selIds.size?S.selIds.size+' selezionate ('+n+(n>1?' copie)':' copia)'):'Tocca le carte da eliminare'}}
+$('#selall').onclick=()=>{const all=(S.curIds||[]).every(i=>S.selIds.has(i));S.selIds=all?new Set():new Set(S.curIds||[]);renderSet()};
+$('#seldel').onclick=async()=>{const ids=[...S.selIds];if(!ids.length)return toast('Seleziona almeno una carta');const n=ids.reduce((a,i)=>a+((S.righe.find(r=>r.id===i)||{}).qta||0),0);
+  if(!confirm('Eliminare '+ids.length+' '+(ids.length>1?'carte selezionate':'carta selezionata')+' ('+n+(n>1?' copie':' copia')+') dalla collezione?'))return;
+  try{await api('/api/elimina',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});toast('Eliminate '+ids.length+(ids.length>1?' carte':' carta'))}catch(e){toast('Errore: '+e)}
+  S.selMode=false;S.selIds=new Set();await caricaColl()};
+async function tre(){const a=[await frame(1280)];for(let i=0;i<2;i++){await new Promise(r=>setTimeout(r,250));a.push(await frame(1280))}return a}
+$('#bbk').onclick=async()=>{await api('/api/backup',{method:'POST'});toast('Backup creato');stInfo()};
+api('/api/stato').then(d=>{if(d&&d.vendi)$('#n-sell').hidden=false;if(d&&d.admin&&d.utente)$('#adm-row').hidden=false;if(d&&d.utente)$('#chi').textContent='Accesso come '+d.utente}).catch(()=>{});
+initFiltri().then(()=>{if(!document.body.classList.contains('drawer-open'))cam()});
+</script></body></html>
