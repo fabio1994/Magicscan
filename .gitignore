@@ -1,0 +1,8 @@
+# dati dell'utente: collezione, indice, immagini, token, password
+magicdata/
+MagicImmagini/
+.env
+*.zip
+__pycache__/
+*.pyc
+collezione.csv

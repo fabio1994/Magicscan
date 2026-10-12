@@ -1,0 +1,10 @@
+# Solo per usare gli script fuori da Docker (per esempio per creare l'indice sul PC).
+# Dentro Docker le dipendenze sono nel Dockerfile.
+# PyTorch (versione CPU) si installa a parte:  pip install torch --index-url https://download.pytorch.org/whl/cpu
+sentence-transformers
+opencv-python-headless
+numpy
+requests
+pillow
+flask
+gunicorn

@@ -1,0 +1,9 @@
+.git
+magicdata
+tests
+tools
+README.md
+LICENSE
+*.zip
+__pycache__
+*.pyc

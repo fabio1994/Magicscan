@@ -1,0 +1,12 @@
+services:
+  magicscan:
+    build: .
+    ports:
+      - "${MAGIC_PORT:-8086}:8086"      # porta sul server : porta nel container (cambia con MAGIC_PORT nel file .env)
+    volumes:
+      - ./magicdata:/app/magicdata
+    environment:
+      - HF_HOME=/app/magicdata/hf
+      # - MAGIC_IMG=small    # immagini piccole (~1,5 GB invece di ~8 GB per tutto Magic)
+      # - MAGIC_VENDI=1      # riattiva la tab "Vendi" (pubblicazione su CardTrader), spenta di default
+    restart: unless-stopped
